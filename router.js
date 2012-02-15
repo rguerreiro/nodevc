@@ -35,14 +35,21 @@ Router.prototype.map = function (ns, controller, isRoot) {
             var basePath = '/' + ns + controller;
             var path = basePath + '/' + action;
             var methods = actions[action].methods;
-            var isDefault = actions[action].isDefault;
+            var isDefault = actions[action].default;
+            var hndlr = controller + '#' + action;
 
-            if(isRoot && isDefault) this.mapper['get'].call(this.mapper, '/', controller + '#' + action);
+            if(isRoot && isDefault) {
+                console.log('Mapping root ==> %s', hndlr);
+                this.mapper['get'].call(this.mapper, '/', hndlr); 
+            }
 
-            console.log('Mapping path %s [%s]', path, methods);
             for (var method in methods){
-                if(isDefault) this.mapper[methods[method]].call(this.mapper, basePath, controller + '#' + action);
-                this.mapper[methods[method]].call(this.mapper, path, controller + '#' + action);
+                if(isDefault) {
+                    console.log('Mapping [%s] %s ==> %s', methods[method], basePath, hndlr);
+                    this.mapper[methods[method]].call(this.mapper, basePath, hndlr);
+                }
+                console.log('Mapping [%s] %s ==> %s', methods[method], path, hndlr);
+                this.mapper[methods[method]].call(this.mapper, path, hndlr);
             }
        }.bind(this))(action);
     }

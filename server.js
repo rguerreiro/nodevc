@@ -12,4 +12,4 @@ app.set('view options', {
 });
 app.listen(process.env.PORT);
 
-console.log("Express server listening on port %s in %s mode", process.env.PORT, app.settings.env);
+console.log("Express server listening on port %s in %s mode [%s]", process.env.PORT, app.settings.env, (new Date()).toString());

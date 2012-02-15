@@ -14,6 +14,7 @@ function Controller(name) {
     var actions = {};
     var useMasterLayout = true;
     var layout = layoutsCache[name];
+    var defaultAction = null;
 
 	// public properties
 	this.controllerName = name;
@@ -26,26 +27,41 @@ function Controller(name) {
     this.__dirname = app.root;
 
 	// methods 
-	this.action = function(name, methods, action){
-        if(typeof methods === 'function') {
-            action = methods;
-            methods = ['get', 'post'];
+	this.action = function(name, options, action){
+        if(typeof options === 'function') {
+            action = options;
+            options = {};
         }
 		
         if (!name) throw new Error('Named function required when `name` param omitted');
 
+        if(typeof options.methods === 'undefined') options.methods = ['get', 'post'];
+        if(typeof options.default === 'undefined') options.default = name.toLowerCase() === 'index' ? true : false;
+
         action.isAction = true;
-        action.isDefault = name.toLowerCase() === 'index' ? true : false;
         action.customName = name;
-        action.methods = methods;
+        
+        // merging options with action
+        for(var option in options) {
+            action[option] = options[option];
+        }
+
+        // setting the new default action
+        if(action.default) { 
+            defaultAction = name.toLowerCase(); 
+            for(var act in actions) {
+                actions[act].default = false;
+            }
+        }
+
         actions[name] = action;
 
-        console.log('Action %s added to controller %s [%s]', name, this.controllerName, methods);
+        console.log('Action %s added to controller %s [%s]', name, this.controllerName, action.methods);
 	}.bind(this);
     this.availableActions = function() {
         if(!this.initialized) this.init();
         return actions;
-    }
+    };
     this.execute = function (actionName, req, res) {
         console.log('Executing action %s', actionName);
 
