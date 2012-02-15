@@ -1,23 +1,28 @@
 var express = require('express');
+var Router = require('./router').Router;
 
 function NodeVC() {
-    global.nodevc = this;
-
     this.utils = require('./utils');
-    this.controller  = require('./controller');
-    this.routes = require('./routes');
+    this.controller = require('./controller');
+    this.router = new Router(app);    
 }
+
+NodeVC.prototype.init = function(app) {
+    console.log('Initialing nodevc framework...');
+    this.controller.init();
+    this.router.init();
+};
 
 exports.init = function (app) {
     if (arguments.length == 2) {
         app = arguments[1];
     }
 
+    console.log('Initialing the app...');
+
     global.app = app;
     app.root = process.cwd();
 
-    new NodeVC();
-
-    nodevc.controller.init();
-    nodevc.routes.init(app);
+    global.nodevc = new NodeVC();
+    global.nodevc.init(app);
 };

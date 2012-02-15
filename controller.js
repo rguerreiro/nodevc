@@ -4,6 +4,8 @@ var path = require('path');
 var layoutsCache = {};
 
 function Controller(name) {
+    console.log('Creating controler %s', name);
+
     if (!layoutsCache[name]) {
         layoutsCache[name] = path.existsSync(app.root + '/views/' + name + '/' + name + '_layout') ? name : null;
     }
@@ -16,10 +18,10 @@ function Controller(name) {
 	// public properties
 	this.controllerName = name;
     this.controllerFile = Controller.index[name];
+    this.initialized = false;
 
-    if (!this.controllerFile) {
+    if (!this.controllerFile)
         throw new Error('Controller ' + name + ' is not defined');
-    }
 
     this.__dirname = app.root;
 
@@ -34,22 +36,28 @@ function Controller(name) {
         if (!name) throw new Error('Named function required when `name` param omitted');
 
         action.isAction = true;
+        action.isDefault = name.toLowerCase() === 'index' ? true : false;
         action.customName = name;
         action.methods = methods;
         actions[name] = action;
-	};
 
+        console.log('Action %s added to controller %s [%s]', name, this.controllerName, methods);
+	}.bind(this);
+    this.availableActions = function() {
+        if(!this.initialized) this.init();
+        return actions;
+    }
     this.execute = function (actionName, req, res) {
+        console.log('Executing action %s', actionName);
+
         res.info = {
             controller: this.controllerName,
             action: actionName,
             startTime: Date.now()
         };
         res.actionHistory = [];
-        if (!this.initialized) {
-            this.init();
-            this.initialized = true;
-        }        
+
+        if (!this.initialized) this.init();
 
         var ctl = this, timeStart = false, prevMethod;
 
@@ -126,9 +134,12 @@ function Controller(name) {
         }
     };
     this.load = function (controller) {
+        console.log('Loading controller %s', controller);
         utils.runCode(Controller.index[controller], this);
     }.bind(this);
     this.init = function () {
+        console.log('Initializing controller %s', this.controllerName);
+
         // reset scope variables
         actions = {};
         layout = null;
@@ -138,6 +149,8 @@ function Controller(name) {
         }.bind(this));
 
         utils.runCode(this.controllerFile, this);
+
+        this.initialized = true;
     };
     this.nomaster = function() {
         useMasterLayout = false;
@@ -179,7 +192,7 @@ Controller.prototype.view = function (arg1, arg2) {
     var layout = params.nomaster ? null : this.layout();
     var file = this.controllerName + '/' + viewName;
 
-    console.log("rendering the view " + file);
+    console.log('Rendering view %s', file);
 
     this.response.renderCalled = true;
     this.response.render(file, {
@@ -191,6 +204,7 @@ Controller.prototype.view = function (arg1, arg2) {
 };
 
 exports.Controller = Controller;
+
 exports.addBasePath = function (basePath, prefix, context) {
     prefix = prefix || '';
     if (path.existsSync(basePath)) {
@@ -202,6 +216,7 @@ exports.addBasePath = function (basePath, prefix, context) {
                     var ctl = prefix + m[1];
                     Controller.index[ctl] = Controller.index[ctl] || path.join(basePath, file);
                     Controller.context[ctl] = Controller.context[ctl] || context;
+                    console.log('Found controller %s', ctl);
                 }
             } else if (stat.isDirectory()) {
                 exports.addBasePath(path.join(basePath, file), prefix + file + '/');
@@ -210,6 +225,7 @@ exports.addBasePath = function (basePath, prefix, context) {
     }
 };
 exports.init = function () {
+    console.log('Initializing controller');
     Controller.index = {};
     Controller.context = {};
     exports.addBasePath(app.root + '/controllers');
