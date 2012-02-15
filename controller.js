@@ -174,7 +174,7 @@ function Controller(name) {
         if (typeof l !== 'undefined') {
             layout = l;
         }
-        return layout ? layout + '/' + layout + '_layout' : (useMasterLayout ? 'master' : null);
+        return layout ? layout + '/' + layout + '_layout' : (useMasterLayout ? 'layout' : null);
     };
 
     this.__defineGetter__('response',  function () { return this.ctx.res }.bind(this));
