@@ -1,0 +1,3 @@
+action('index', function () {
+    view();
+});

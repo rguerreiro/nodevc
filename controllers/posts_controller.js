@@ -1,5 +1,5 @@
 action('index', function () {
-    view({ nomaster: true });
+    view();
 });
 
 action('index2', function () {

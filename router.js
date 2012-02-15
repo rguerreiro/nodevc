@@ -60,19 +60,19 @@ Router.prototype.addRoutes = function(path){
         throw new Error('Routes is not defined in ' + path);
     }
     console.log('Executing the routes definition from %s', path);
-    return routes(this);
+    return routes(this.mapper);
 };
 
 Router.prototype.init = function() {
     console.log('Initializing router');
 
-    var controllers = nodevc.controller.get();
-    for(var ctl in controllers) {
-        this.map(ctl);
-    }
-
     if (path.existsSync(app.root + '/routes.js')) {
         this.addRoutes(app.root + '/routes');
+    }
+
+    var controllers = nodevc.controller.get();
+    for(var ctl in controllers) {
+        this.map(ctl, ctl === 'home');
     }
 
     console.log('Available routes:');
