@@ -3,5 +3,5 @@ exports.routes = function (router) {
     //map.all(':controller/:action');
     //map.all(':controller/:action/:id');
 
-    router.map('posts', true);
+    //router.map('posts', true);
 };

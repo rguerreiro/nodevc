@@ -26,7 +26,6 @@ function Controller(name) {
     this.__dirname = app.root;
 
 	// methods 
-    // support for both get and post
 	this.action = function(name, methods, action){
         if(typeof methods === 'function') {
             action = methods;
@@ -232,4 +231,7 @@ exports.init = function () {
 };
 exports.load = function (name) {
     return new Controller(name);
+};
+exports.get = function () {
+    return Controller.index;
 };
