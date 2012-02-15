@@ -5,7 +5,7 @@ var app = module.exports = express.createServer();
 
 nodevc.init(app);
 
-app.set('view engine', 'ejs');
+app.set('view engine', 'ejs'); // must always be set
 app.set('view options', {
     open: '{{',
     close: '}}'

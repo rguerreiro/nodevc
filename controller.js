@@ -2,6 +2,7 @@ var utils = require('./utils');
 var fs = require('fs');
 var path = require('path');
 var layoutsCache = {};
+var controllers = {};
 
 function Controller(name) {
     console.log('Creating controler %s', name);
@@ -246,7 +247,10 @@ exports.init = function () {
     exports.addBasePath(app.root + '/controllers');
 };
 exports.load = function (name) {
-    return new Controller(name);
+    if(!controllers[name]) {
+        controllers[name] = new Controller(name);
+    }
+    return controllers[name];
 };
 exports.get = function () {
     return Controller.index;
