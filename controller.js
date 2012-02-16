@@ -82,21 +82,10 @@ function Controller(name) {
             res: res,
             next: next,
             action: actionName,
-            //paths: Controller.getPathTo(actionName, req, res)
+            paths: Controller.getPathTo(actionName, req, res)
         };
 
         req.sandbox = {};
-
-        if (req.body && req.method !== 'GET') {
-            var filteredBody = {};
-            Object.keys(req.body).forEach(function (param) {
-                if (!filterParams.some(function (filter) {return param.search(filter) !== -1;})) {
-                    filteredBody[param] = req.body[param];
-                } else {
-                    filteredBody[param] = '[FILTERED]';
-                }
-            });
-        }
 
         var queue = [];
 
@@ -217,6 +206,9 @@ Controller.prototype.view = function (arg1, arg2) {
         debug:  false
     });
     if (this.request.inAction) this.next();
+};
+Controller.getPathTo = function (actionName, req, res) {
+    return nodevc.router.mapper.pathTo;
 };
 
 exports.Controller = Controller;

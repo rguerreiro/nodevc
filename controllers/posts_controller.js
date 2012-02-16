@@ -5,3 +5,7 @@ action('index', function () {
 action('index2', { default: true }, function () {
     view({ nomaster: true });
 });
+
+action('xpto', function () {
+	view();
+})
