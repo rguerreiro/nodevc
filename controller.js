@@ -1,20 +1,20 @@
 var utils = require('./utils');
 var fs = require('fs');
 var path = require('path');
-var layoutsCache = {};
+var layouts = {};
 var controllers = {};
 
 function Controller(name) {
     console.log('Creating controler %s', name);
 
-    if (!layoutsCache[name]) {
-        layoutsCache[name] = path.existsSync(app.root + '/views/' + name + '/' + name + '_layout') ? name : null;
+    if (!layouts[name]) {
+        layouts[name] = path.existsSync(app.root + '/views/' + name + '/' + name + '_layout') ? name : null;
     }
 
     // private properties
     var actions = {};
     var useMasterLayout = true;
-    var layout = layoutsCache[name];
+    var layout = layouts[name];
     var defaultAction = null;
 
 	// public properties
@@ -37,6 +37,9 @@ function Controller(name) {
         if (!name) throw new Error('Named function required when `name` param omitted');
 
         if(typeof options.methods === 'undefined') options.methods = ['get', 'post'];
+        else if (typeof options.methods === 'string') {
+            options.methods = [ options.methods ]; 
+        }
         if(typeof options.default === 'undefined') options.default = name.toLowerCase() === 'index' ? true : false;
 
         action.isAction = true;
@@ -206,6 +209,22 @@ Controller.prototype.view = function (arg1, arg2) {
         debug:  false
     });
     if (this.request.inAction) this.next();
+};
+Controller.prototype.partial = function (arg1, arg2) {
+    var viewName, params;
+    if (typeof arg1 == 'string') {
+        viewName = arg1;
+        params = arg2;
+    } else {
+        viewName = this.actionName;
+        params = arg1;
+    }
+    params = params || {};
+    params.nomaster = true;
+    
+    console.log('Rendering partial %s', viewName);
+
+    this.view(viewName, params);
 };
 Controller.getPathTo = function (actionName, req, res) {
     return nodevc.router.mapper.pathTo;

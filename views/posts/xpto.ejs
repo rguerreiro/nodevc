@@ -1,1 +1,23 @@
 <h1>XPTO</h1>
+
+<a href="#" id="btn">click here</a>
+
+<div id="divhtml"></div>
+
+<script type="text/javascript">
+	$(document).ready(function() {
+		$("#btn").on("click", function() {
+			$.ajax({
+				url: "/posts/ajax",
+				type: "post",
+				data: { abc: "sdgs", num: 12 },
+				error: function() {
+					alert("error");
+				},
+			  	success: function(html) {
+			    	$('#divhtml').html(html);
+			  	}
+			});
+		})
+	});
+</script>
