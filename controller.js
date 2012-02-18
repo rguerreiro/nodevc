@@ -182,16 +182,28 @@ function Controller(name) {
     this.__defineGetter__('path_to',   function () { return this.ctx.paths }.bind(this));
 }
 
-Controller.prototype.view = function (arg1, arg2) {
-    var viewName, params;
+Controller.prototype.view = function (arg1, arg2, arg3) {
+    var viewName, model, params;
     if (typeof arg1 == 'string') {
         viewName = arg1;
-        params = arg2;
+        if(arg2 && arg2.params) {
+            params = arg2;
+        } else {
+            model = arg2;
+            params = arg3;
+        }
     } else {
         viewName = this.actionName;
-        params = arg1;
+        if (arg1 && arg1.params) {
+            params = arg1.params;
+        } else {
+            model = arg1;
+            params = arg2;
+        }
     }
+
     params = params || {};
+    params.model = model || {};
     params.controllerName = params.controllerName || this.controllerName;
     params.actionName = params.actionName || this.actionName;
     params.path_to = this.path_to;
@@ -204,27 +216,38 @@ Controller.prototype.view = function (arg1, arg2) {
 
     this.response.renderCalled = true;
     this.response.render(file, {
-        locals: utils.safe_merge(params, this.request.sandbox),
+        locals: utils.safe_merge(params, this.request.sandbox, this.path_to),
         layout: layout ? layout : false,
         debug:  false
     });
     if (this.request.inAction) this.next();
 };
-Controller.prototype.partial = function (arg1, arg2) {
-    var viewName, params;
+Controller.prototype.partial = function (arg1, arg2, arg3) {
+    var viewName, model, params;
     if (typeof arg1 == 'string') {
         viewName = arg1;
-        params = arg2;
+        if(arg2 && arg2.params) {
+            params = arg2;
+        } else {
+            model = arg2;
+            params = arg3;
+        }
     } else {
         viewName = this.actionName;
-        params = arg1;
+        if (arg1 && arg1.params) {
+            params = arg1.params;
+        } else {
+            model = arg1;
+            params = arg2;
+        }
     }
+
     params = params || {};
     params.nomaster = true;
     
     console.log('Rendering partial %s', viewName);
 
-    this.view(viewName, params);
+    this.view(viewName, model, params);
 };
 Controller.getPathTo = function (actionName, req, res) {
     return nodevc.router.mapper.pathTo;

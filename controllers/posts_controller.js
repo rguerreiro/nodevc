@@ -7,9 +7,19 @@ action('index2', { default: true }, function () {
 });
 
 action('xpto', { methods: 'get' }, function () {
-	view();
+	view({test: 1234});
 });
 
 action('ajax', { methods: 'post' }, function () {
-	partial('partial');
+	partial('partial', { name : 'rodrigo' });
 });
+
+// view();
+// view('index');
+// view({ abc: 123 });
+// view({ params: { nomaster: true } });
+// view('index', { abc: 123 });
+// view('index', { params: { nomaster: true } });
+// view({ abc: 123 }, { nomaster: true });
+// view({ params: { nomaster: true } });
+// view('index', { abc: 123 }, { nomaster: true });
